@@ -1,0 +1,2198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>System Design - AWS Community Day Colombia 2026</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;900&display=swap');
+
+  :root {
+    --orange: #ff9900;
+    --cerise: #2f22e6;
+    --dark-cerise: #231b99;
+    --light-blue: #ecedfc;
+    --yellow: #f1c817;
+    --blue: #0e184d;
+    --red: #c81427;
+    --beige: #e7cba9;
+    --dark-blue: #0d1429;
+    --dark-blue-transparent: #0d1429cc;
+    --dark-blue-bg: #0d152b80;
+    --gray: #999999;
+    --gray-transparent: #99999944;
+    --white: #f6f7fd;
+    --white-transparent: #f6f7fdbb;
+    --white-light: #eceef7;
+    --black: #111111;
+    --black-transparent: #000000cc;
+    --white-background: #f6f7fd;
+    --navy-blue-background: #071026;
+    --footer-background: #101522;
+    --header-background-mobile: #071026;
+    --hover: #f8b248;
+    --hover-link: #a71c5b;
+    --disabled: #929292;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #0a0e1a;
+    color: #e0e0e0;
+    line-height: 1.6;
+  }
+
+  /* ===== SIDEBAR NAV ===== */
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 260px;
+    height: 100vh;
+    background: #0d1429;
+    border-right: 1px solid #1a2040;
+    padding: 24px 0;
+    overflow-y: auto;
+    z-index: 100;
+  }
+
+  .sidebar-logo {
+    padding: 0 20px 24px;
+    border-bottom: 1px solid #1a2040;
+    margin-bottom: 16px;
+  }
+
+  .sidebar-logo h2 {
+    color: var(--orange);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+
+  .sidebar-logo p {
+    color: #667;
+    font-size: 11px;
+    margin-top: 4px;
+  }
+
+  .nav-section {
+    padding: 8px 20px;
+    margin-top: 8px;
+  }
+
+  .nav-section-title {
+    font-size: 10px;
+    font-weight: 700;
+    color: #556;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .nav-link {
+    display: block;
+    padding: 6px 12px;
+    color: #99a;
+    text-decoration: none;
+    font-size: 13px;
+    border-radius: 6px;
+    transition: all 0.2s;
+    margin-bottom: 2px;
+  }
+
+  .nav-link:hover {
+    background: #1a2040;
+    color: var(--orange);
+  }
+
+  .nav-link.active {
+    background: #ff990015;
+    color: var(--orange);
+  }
+
+  /* ===== MAIN CONTENT ===== */
+  .main {
+    margin-left: 260px;
+    padding: 40px 48px;
+    max-width: 1200px;
+  }
+
+  .page-header {
+    margin-bottom: 48px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #1a2040;
+  }
+
+  .page-header h1 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  .page-header p {
+    color: #778;
+    font-size: 15px;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+
+  .badge-version { background: #ff990020; color: var(--orange); }
+  .badge-angular { background: #dd003120; color: #ff4d6a; }
+  .badge-react { background: #61dafb20; color: #61dafb; }
+
+  /* ===== SECTIONS ===== */
+  section {
+    margin-bottom: 64px;
+  }
+
+  .section-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-title::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 22px;
+    background: var(--orange);
+    border-radius: 2px;
+  }
+
+  .section-desc {
+    color: #778;
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+
+  /* ===== COLOR PALETTE ===== */
+  .color-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+  }
+
+  .color-card {
+    background: #111827;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #1a2040;
+    transition: transform 0.2s;
+  }
+
+  .color-card:hover { transform: translateY(-2px); }
+
+  .color-swatch {
+    height: 80px;
+    position: relative;
+  }
+
+  .color-info {
+    padding: 12px;
+  }
+
+  .color-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #dde;
+    margin-bottom: 2px;
+  }
+
+  .color-hex {
+    font-size: 12px;
+    color: #667;
+    font-family: 'Courier New', monospace;
+  }
+
+  .color-var {
+    font-size: 11px;
+    color: #556;
+    font-family: 'Courier New', monospace;
+    margin-top: 2px;
+  }
+
+  /* ===== TYPOGRAPHY ===== */
+  .type-scale {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .type-row {
+    display: flex;
+    align-items: baseline;
+    gap: 24px;
+    padding: 12px 16px;
+    background: #111827;
+    border-radius: 8px;
+    border: 1px solid #1a2040;
+  }
+
+  .type-label {
+    min-width: 80px;
+    font-size: 11px;
+    color: #667;
+    font-family: 'Courier New', monospace;
+  }
+
+  .type-size {
+    min-width: 50px;
+    font-size: 11px;
+    color: var(--orange);
+    font-family: 'Courier New', monospace;
+  }
+
+  .type-sample {
+    color: #dde;
+  }
+
+  .font-weights {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .weight-card {
+    background: #111827;
+    border: 1px solid #1a2040;
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .weight-card .sample { color: #fff; font-size: 24px; margin-bottom: 8px; }
+  .weight-card .label { font-size: 11px; color: #667; }
+  .weight-card .value { font-size: 11px; color: var(--orange); font-family: monospace; }
+
+  /* ===== SPACING ===== */
+  .spacing-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #111827;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #1a2040;
+  }
+
+  .spacing-table th {
+    background: #0d1429;
+    color: #99a;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 12px 16px;
+    text-align: left;
+  }
+
+  .spacing-table td {
+    padding: 10px 16px;
+    border-top: 1px solid #1a2040;
+    font-size: 13px;
+  }
+
+  .spacing-table td:first-child {
+    font-family: monospace;
+    color: var(--orange);
+    font-size: 12px;
+  }
+
+  .spacing-bar {
+    height: 8px;
+    background: var(--cerise);
+    border-radius: 4px;
+    opacity: 0.7;
+  }
+
+  /* ===== COMPONENTS ===== */
+  .component-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+  }
+
+  .component-card {
+    background: #111827;
+    border: 1px solid #1a2040;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .component-preview {
+    padding: 24px;
+    background: #0d1429;
+    min-height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .component-meta {
+    padding: 16px;
+  }
+
+  .component-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+
+  .component-desc {
+    font-size: 12px;
+    color: #667;
+    margin-bottom: 8px;
+  }
+
+  .component-file {
+    font-size: 11px;
+    color: var(--cerise);
+    font-family: monospace;
+    background: #2f22e610;
+    padding: 2px 8px;
+    border-radius: 4px;
+    display: inline-block;
+  }
+
+  /* ===== WIREFRAMES ===== */
+  .wireframe-container {
+    background: #111827;
+    border: 1px solid #1a2040;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 32px;
+  }
+
+  .wireframe-title-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: #0d1429;
+    border-bottom: 1px solid #1a2040;
+  }
+
+  .wireframe-title-bar h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #dde;
+  }
+
+  .wireframe-status {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 10px;
+    font-weight: 600;
+  }
+
+  .status-active { background: #10b98120; color: #10b981; }
+  .status-commented { background: #f59e0b20; color: #f59e0b; }
+  .status-partial { background: #6366f120; color: #818cf8; }
+
+  .wireframe {
+    padding: 24px;
+    min-height: 200px;
+  }
+
+  /* Wireframe inner elements */
+  .wf-block {
+    border: 1.5px dashed #2a3050;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 12px;
+    position: relative;
+  }
+
+  .wf-block-label {
+    position: absolute;
+    top: -9px;
+    left: 12px;
+    background: #111827;
+    padding: 0 6px;
+    font-size: 10px;
+    color: var(--orange);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .wf-header {
+    height: 48px;
+    background: var(--navy-blue-background);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    margin-bottom: 12px;
+  }
+
+  .wf-logo {
+    width: 100px;
+    height: 24px;
+    background: var(--orange);
+    border-radius: 4px;
+    opacity: 0.8;
+  }
+
+  .wf-nav {
+    display: flex;
+    gap: 16px;
+  }
+
+  .wf-nav-item {
+    width: 60px;
+    height: 10px;
+    background: #334;
+    border-radius: 5px;
+  }
+
+  .wf-hero {
+    height: 300px;
+    background: linear-gradient(135deg, #0d1429 0%, #1a2050 100%);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .wf-hero::before {
+    content: 'VIDEO BG';
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 9px;
+    color: #445;
+    background: #0d142980;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  .wf-hero-title {
+    color: #fff;
+    font-size: 22px;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  .wf-hero-title span { color: var(--orange); }
+
+  .wf-hero-subtitle {
+    font-size: 12px;
+    color: #99a;
+    text-align: center;
+  }
+
+  .wf-btn {
+    padding: 8px 24px;
+    background: var(--orange);
+    color: #000;
+    border: none;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: default;
+  }
+
+  .wf-btn-outline {
+    padding: 8px 24px;
+    background: transparent;
+    color: var(--orange);
+    border: 1.5px solid var(--orange);
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .wf-timer {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-top: 8px;
+  }
+
+  .wf-timer-item {
+    text-align: center;
+    color: #99a;
+    font-size: 10px;
+  }
+
+  .wf-timer-item .num {
+    display: block;
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .wf-section-title {
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--orange);
+    display: inline-block;
+  }
+
+  .wf-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 10px;
+  }
+
+  .wf-card {
+    background: #1a2040;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .wf-card-img {
+    height: 70px;
+    background: linear-gradient(135deg, #2a3060, #1a2040);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .wf-card-img-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #334;
+  }
+
+  .wf-card-body {
+    padding: 8px;
+  }
+
+  .wf-card-body .wf-line {
+    height: 6px;
+    background: #2a3050;
+    border-radius: 3px;
+    margin-bottom: 4px;
+  }
+
+  .wf-card-body .wf-line.short { width: 60%; }
+
+  .wf-map-container {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 12px;
+  }
+
+  .wf-transport-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .wf-transport-item {
+    background: #1a2040;
+    border-radius: 6px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: #99a;
+  }
+
+  .wf-transport-icon {
+    width: 24px;
+    height: 24px;
+    background: var(--cerise);
+    border-radius: 6px;
+    opacity: 0.6;
+  }
+
+  .wf-map {
+    background: #1a2040;
+    border-radius: 8px;
+    min-height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #445;
+    font-size: 12px;
+  }
+
+  .wf-faq-item {
+    background: #1a2040;
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .wf-faq-q { font-size: 12px; color: #99a; }
+  .wf-faq-arrow { color: #556; font-size: 14px; }
+
+  .wf-footer {
+    background: var(--footer-background);
+    border-radius: 6px;
+    padding: 12px;
+    text-align: center;
+    font-size: 11px;
+    color: #556;
+    margin-top: 12px;
+  }
+
+  .wf-carousel {
+    display: flex;
+    gap: 12px;
+    overflow: hidden;
+  }
+
+  .wf-carousel-item {
+    min-width: 120px;
+    height: 100px;
+    background: linear-gradient(135deg, #1a2040, #2a3060);
+    border-radius: 8px;
+    display: flex;
+    align-items: flex-end;
+    padding: 8px;
+  }
+
+  .wf-carousel-label {
+    font-size: 10px;
+    color: #ccd;
+    background: #00000088;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  .wf-tabs {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 12px;
+  }
+
+  .wf-tab {
+    padding: 6px 14px;
+    background: #1a2040;
+    border-radius: 6px 6px 0 0;
+    font-size: 11px;
+    color: #667;
+  }
+
+  .wf-tab.active {
+    background: var(--cerise);
+    color: #fff;
+  }
+
+  .wf-schedule-item {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 8px;
+    padding: 8px;
+    background: #1a2040;
+    border-radius: 6px;
+    border-left: 3px solid var(--orange);
+  }
+
+  .wf-schedule-time {
+    font-size: 10px;
+    color: var(--orange);
+    min-width: 70px;
+    font-family: monospace;
+  }
+
+  .wf-schedule-info .title { font-size: 12px; color: #dde; margin-bottom: 2px; }
+  .wf-schedule-info .speaker { font-size: 10px; color: #667; }
+
+  .wf-sponsors-section {
+    text-align: center;
+    padding: 16px;
+  }
+
+  .wf-sponsor-tier {
+    margin-bottom: 16px;
+  }
+
+  .wf-sponsor-tier-label {
+    font-size: 10px;
+    color: #667;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  .wf-sponsor-logos {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .wf-sponsor-logo {
+    width: 60px;
+    height: 40px;
+    background: #fff;
+    border-radius: 6px;
+    opacity: 0.2;
+  }
+
+  .wf-sponsor-logo.plat { opacity: 0.5; width: 80px; height: 50px; }
+  .wf-sponsor-logo.gold { opacity: 0.35; width: 70px; height: 45px; }
+
+  .wf-organizer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    gap: 8px;
+  }
+
+  .wf-organizer {
+    text-align: center;
+  }
+
+  .wf-organizer-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2a3060, #1a2040);
+    margin: 0 auto 4px;
+  }
+
+  .wf-organizer-name {
+    font-size: 9px;
+    color: #667;
+  }
+
+  /* ===== ACTIVATION GUIDE ===== */
+  .guide-steps {
+    counter-reset: step;
+  }
+
+  .guide-step {
+    background: #111827;
+    border: 1px solid #1a2040;
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+    position: relative;
+    padding-left: 60px;
+  }
+
+  .guide-step::before {
+    counter-increment: step;
+    content: counter(step);
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    width: 28px;
+    height: 28px;
+    background: var(--orange);
+    color: #000;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .guide-step h4 {
+    font-size: 15px;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+
+  .guide-step p {
+    font-size: 13px;
+    color: #99a;
+    margin-bottom: 4px;
+  }
+
+  .code-block {
+    background: #0d1429;
+    border: 1px solid #1a2040;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-top: 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    color: #8be9fd;
+    overflow-x: auto;
+    white-space: pre;
+    line-height: 1.5;
+  }
+
+  .code-comment { color: #6272a4; }
+  .code-string { color: #f1fa8c; }
+  .code-keyword { color: #ff79c6; }
+  .code-tag { color: #ff6e6e; }
+
+  .highlight-box {
+    background: #ff990010;
+    border: 1px solid #ff990030;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin: 12px 0;
+    font-size: 13px;
+    color: var(--orange);
+  }
+
+  .warning-box {
+    background: #f59e0b10;
+    border: 1px solid #f59e0b30;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin: 12px 0;
+    font-size: 13px;
+    color: #f59e0b;
+  }
+
+  /* ===== PAGE MAP ===== */
+  .page-map {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background: #111827;
+    border: 1px solid #1a2040;
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .page-map-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: background 0.2s;
+  }
+
+  .page-map-row:hover { background: #1a2040; }
+
+  .page-map-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .page-map-info { flex: 1; }
+  .page-map-name { font-size: 13px; color: #dde; font-weight: 600; }
+  .page-map-path { font-size: 11px; color: #556; font-family: monospace; }
+
+  .icon-active { background: #10b98130; }
+  .icon-commented { background: #f59e0b30; }
+
+  /* ===== BUILDERS APP SECTION ===== */
+  .app-card {
+    background: #111827;
+    border: 1px solid #1a2040;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .app-card h4 { font-size: 15px; color: #fff; margin-bottom: 6px; }
+  .app-card p { font-size: 13px; color: #99a; }
+
+  .route-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    background: #61dafb15;
+    color: #61dafb;
+    border-radius: 4px;
+    font-size: 11px;
+    font-family: monospace;
+    margin-right: 6px;
+    margin-bottom: 4px;
+  }
+
+  /* ===== DATA MODEL ===== */
+  .model-block {
+    background: #0d1429;
+    border: 1px solid #1a2040;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    line-height: 1.6;
+    overflow-x: auto;
+  }
+
+  .model-title {
+    color: #ff79c6;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .model-field { color: #8be9fd; }
+  .model-type { color: #50fa7b; }
+  .model-optional { color: #6272a4; }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; padding: 20px; }
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #0a0e1a; }
+  ::-webkit-scrollbar-thumb { background: #2a3050; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <h2>AWS CDC Colombia</h2>
+    <p>System Design v1.0 &middot; 2026</p>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Fundamentos</div>
+    <a href="#colors" class="nav-link">Paleta de Colores</a>
+    <a href="#typography" class="nav-link">Tipografia</a>
+    <a href="#spacing" class="nav-link">Espaciado</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Componentes</div>
+    <a href="#components" class="nav-link">Componentes UI</a>
+    <a href="#data-models" class="nav-link">Modelos de Datos</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Wireframes - Main Website</div>
+    <a href="#wf-full" class="nav-link">Vista Completa (Full)</a>
+    <a href="#wf-header" class="nav-link">Header</a>
+    <a href="#wf-hero" class="nav-link">Hero</a>
+    <a href="#wf-about" class="nav-link">About</a>
+    <a href="#wf-activities" class="nav-link">Actividades</a>
+    <a href="#wf-agenda" class="nav-link">Agenda Preview</a>
+    <a href="#wf-speakers" class="nav-link">Speakers</a>
+    <a href="#wf-location" class="nav-link">Ubicacion</a>
+    <a href="#wf-organizers" class="nav-link">Organizadores</a>
+    <a href="#wf-faq" class="nav-link">FAQ</a>
+    <a href="#wf-sponsors-invite" class="nav-link">Sponsors Invite</a>
+    <a href="#wf-sponsors" class="nav-link">Sponsors</a>
+    <a href="#wf-footer" class="nav-link">Footer</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Builders App (React)</div>
+    <a href="#builders-app" class="nav-link">Rutas & Estructura</a>
+    <a href="#builders-components" class="nav-link">Componentes</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Guia de Actualizacion</div>
+    <a href="#activation-guide" class="nav-link">Activar Secciones</a>
+    <a href="#date-updates" class="nav-link">Fechas & Datos</a>
+    <a href="#nav-updates" class="nav-link">Navegacion</a>
+  </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+
+  <div class="page-header">
+    <h1>System Design <span class="badge badge-version">v1.0</span></h1>
+    <p>AWS Community Day Colombia 2026 &mdash; Documentacion completa del design system, wireframes y guia de actualizacion</p>
+    <p style="margin-top: 8px;">
+      <span class="badge badge-angular">Angular (Main Website)</span>
+      <span class="badge badge-react">React (Builders App)</span>
+    </p>
+  </div>
+
+  <!-- ========== MAPA DE PAGINAS ========== -->
+  <section id="page-map">
+    <h2 class="section-title">Mapa del Sitio - Estado Actual</h2>
+    <p class="section-desc">Secciones activas vs. comentadas en home.component.html. Las secciones en amarillo necesitan ser activadas.</p>
+
+    <div class="page-map">
+      <div class="page-map-row">
+        <div class="page-map-icon icon-active">&#9679;</div>
+        <div class="page-map-info">
+          <div class="page-map-name">Header (Navegacion)</div>
+          <div class="page-map-path">shared/components/header/ &mdash; Activo: Ubicacion, FAQ, Sponsors</div>
+        </div>
+        <span class="wireframe-status status-active">ACTIVO</span>
+      </div>
+      <div class="page-map-row">
+        <div class="page-map-icon icon-active">&#9679;</div>
+        <div class="page-map-info">
+          <div class="page-map-name">Hero Section</div>
+          <div class="page-map-path">home/shared/components/hero/ &mdash; Video bg + countdown + CTA</div>
+        </div>
+        <span class="wireframe-status status-active">ACTIVO</span>
+      </div>
+      <div class="page-map-row">
+        <div class="page-map-icon icon-commented">&#9679;</div>
+        <div class="page-map-info">
+          <div class="page-map-name">About / Acerca del Evento</div>
+          <div class="page-map-path">home/shared/components/about/ &mdash; Descripcion + ubicacion + fecha</div>
+        </div>
+        <span class="wireframe-status status-commented">COMENTADO</span>
+      </div>
+      <div class="page-map-row">
+        <div class="page-map-icon icon-commented">&#9679;</div>
+        <div class="page-map-info">
+          <div class="page-map-name">Actividades</div>
+          <div class="page-map-path">home/shared/components/activity/ &mdash; Carousel de 7 tipos de actividades</div>
+        </div>
+        <span class="wireframe-status status-commented">COMENTADO</span>
+      </div>
+      <div class="page-map-row">
+        <div class="page-map-icon icon-commented">&#9679;</div>
+        <div class="page-map-info">
+          <div class="page-map-name">Agenda Preview</div>
+          <div class="page-map-path">home/shared/components/schedule-preview/ &mdash; Tabs por sala + session cards</div>
+        </div>
+        <span class="wireframe-status status-commented">COMENTADO</span>
+      </div>
+      <div class="page-map-row">
+        <div class="page-map-icon icon-commented">&#9679;</div>
+        <div class="page-map-info">
+          <div class="page-map-name">Speakers</div>
+          <div class="page-map-path">home/shared/components/speakers/ &mdash; Grid de speaker cards con LinkedIn</div>
+        </div>
+        <span class="wireframe-status status-commented">COMENTADO</span>
+      </div>
+      <div class="page-map-row">
+        <div class="page-map-icon icon-active">&#9679;</div>
+        <div class="page-map-info">
+          <div class="page-map-name">Ubicacion</div>
+          <div class="page-map-path">home/shared/components/location/ &mdash; Google Maps + transporte + Waze</div>
+        </div>
+        <span class="wireframe-status status-active">ACTIVO</span>
+      </div>
+      <div class="page-map-row">
+        <div class="page-map-icon icon-commented">&#9679;</div>
+        <div class="page-map-info">
+          <div class="page-map-name">Organizadores</div>
+          <div class="page-map-path">home/shared/components/organizers/ &mdash; Grid de 21 lideres comunitarios</div>
+        </div>
+        <span class="wireframe-status status-commented">COMENTADO</span>
+      </div>
+      <div class="page-map-row">
+        <div class="page-map-icon icon-active">&#9679;</div>
+        <div class="page-map-info">
+          <div class="page-map-name">Preguntas Frecuentes (FAQ)</div>
+          <div class="page-map-path">home/shared/components/event-qa/ &mdash; 8 preguntas accordion</div>
+        </div>
+        <span class="wireframe-status status-active">ACTIVO</span>
+      </div>
+      <div class="page-map-row">
+        <div class="page-map-icon icon-active">&#9679;</div>
+        <div class="page-map-info">
+          <div class="page-map-name">Sponsors Invite</div>
+          <div class="page-map-path">home/shared/components/sponsors-invite/ &mdash; CTA para patrocinadores</div>
+        </div>
+        <span class="wireframe-status status-active">ACTIVO</span>
+      </div>
+      <div class="page-map-row">
+        <div class="page-map-icon icon-commented">&#9679;</div>
+        <div class="page-map-info">
+          <div class="page-map-name">Sponsors (Logos)</div>
+          <div class="page-map-path">home/shared/components/sponsors/ &mdash; Grid de logos por tier</div>
+        </div>
+        <span class="wireframe-status status-commented">COMENTADO</span>
+      </div>
+      <div class="page-map-row">
+        <div class="page-map-icon icon-active">&#9679;</div>
+        <div class="page-map-info">
+          <div class="page-map-name">Footer</div>
+          <div class="page-map-path">shared/components/footer/ &mdash; Copyright</div>
+        </div>
+        <span class="wireframe-status status-active">ACTIVO</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== COLORES ========== -->
+  <section id="colors">
+    <h2 class="section-title">Paleta de Colores</h2>
+    <p class="section-desc">Variables CSS definidas en design-system.scss. Fuente tipografica: Amazon Ember.</p>
+
+    <h3 style="color:#99a; font-size:13px; margin-bottom:12px; font-weight:600;">Colores Primarios</h3>
+    <div class="color-grid">
+      <div class="color-card">
+        <div class="color-swatch" style="background:#ff9900"></div>
+        <div class="color-info">
+          <div class="color-name">Orange (Primario)</div>
+          <div class="color-hex">#ff9900</div>
+          <div class="color-var">--orange</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:#2f22e6"></div>
+        <div class="color-info">
+          <div class="color-name">Cerise (Accent)</div>
+          <div class="color-hex">#2f22e6</div>
+          <div class="color-var">--cerise</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:#231b99"></div>
+        <div class="color-info">
+          <div class="color-name">Dark Cerise</div>
+          <div class="color-hex">#231b99</div>
+          <div class="color-var">--dark-cerise</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:#f1c817"></div>
+        <div class="color-info">
+          <div class="color-name">Yellow</div>
+          <div class="color-hex">#f1c817</div>
+          <div class="color-var">--yellow</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:#c81427"></div>
+        <div class="color-info">
+          <div class="color-name">Red</div>
+          <div class="color-hex">#c81427</div>
+          <div class="color-var">--red</div>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="color:#99a; font-size:13px; margin:24px 0 12px; font-weight:600;">Fondos & Superficies</h3>
+    <div class="color-grid">
+      <div class="color-card">
+        <div class="color-swatch" style="background:#0d1429"></div>
+        <div class="color-info">
+          <div class="color-name">Dark Blue</div>
+          <div class="color-hex">#0d1429</div>
+          <div class="color-var">--dark-blue</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:#071026"></div>
+        <div class="color-info">
+          <div class="color-name">Navy Blue BG</div>
+          <div class="color-hex">#071026</div>
+          <div class="color-var">--navy-blue-background</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:#101522"></div>
+        <div class="color-info">
+          <div class="color-name">Footer BG</div>
+          <div class="color-hex">#101522</div>
+          <div class="color-var">--footer-background</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:#0e184d"></div>
+        <div class="color-info">
+          <div class="color-name">Blue</div>
+          <div class="color-hex">#0e184d</div>
+          <div class="color-var">--blue</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:#0d1429cc"></div>
+        <div class="color-info">
+          <div class="color-name">Dark Blue Transparent</div>
+          <div class="color-hex">#0d1429cc</div>
+          <div class="color-var">--dark-blue-transparent</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:#0d152b80"></div>
+        <div class="color-info">
+          <div class="color-name">Dark Blue BG</div>
+          <div class="color-hex">#0d152b80</div>
+          <div class="color-var">--dark-blue-bg</div>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="color:#99a; font-size:13px; margin:24px 0 12px; font-weight:600;">Claros & Neutrales</h3>
+    <div class="color-grid">
+      <div class="color-card">
+        <div class="color-swatch" style="background:#f6f7fd"></div>
+        <div class="color-info">
+          <div class="color-name">White BG</div>
+          <div class="color-hex">#f6f7fd</div>
+          <div class="color-var">--white / --white-background</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:#ecedfc"></div>
+        <div class="color-info">
+          <div class="color-name">Light Blue</div>
+          <div class="color-hex">#ecedfc</div>
+          <div class="color-var">--light-blue</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:#eceef7"></div>
+        <div class="color-info">
+          <div class="color-name">White Light</div>
+          <div class="color-hex">#eceef7</div>
+          <div class="color-var">--white-light</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:#e7cba9"></div>
+        <div class="color-info">
+          <div class="color-name">Beige</div>
+          <div class="color-hex">#e7cba9</div>
+          <div class="color-var">--beige</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:#999999"></div>
+        <div class="color-info">
+          <div class="color-name">Gray</div>
+          <div class="color-hex">#999999</div>
+          <div class="color-var">--gray</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:#111111"></div>
+        <div class="color-info">
+          <div class="color-name">Black</div>
+          <div class="color-hex">#111111</div>
+          <div class="color-var">--black</div>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="color:#99a; font-size:13px; margin:24px 0 12px; font-weight:600;">Estados Interactivos</h3>
+    <div class="color-grid">
+      <div class="color-card">
+        <div class="color-swatch" style="background:#f8b248"></div>
+        <div class="color-info">
+          <div class="color-name">Hover</div>
+          <div class="color-hex">#f8b248</div>
+          <div class="color-var">--hover</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:#a71c5b"></div>
+        <div class="color-info">
+          <div class="color-name">Hover Link</div>
+          <div class="color-hex">#a71c5b</div>
+          <div class="color-var">--hover-link</div>
+        </div>
+      </div>
+      <div class="color-card">
+        <div class="color-swatch" style="background:#929292"></div>
+        <div class="color-info">
+          <div class="color-name">Disabled</div>
+          <div class="color-hex">#929292</div>
+          <div class="color-var">--disabled</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== TIPOGRAFIA ========== -->
+  <section id="typography">
+    <h2 class="section-title">Tipografia</h2>
+    <p class="section-desc">Fuente principal: Amazon Ember (cargada localmente como TTF). Pesos disponibles: 200-900.</p>
+
+    <div class="type-scale">
+      <div class="type-row">
+        <span class="type-label">--font-size-4xl</span>
+        <span class="type-size">60px</span>
+        <span class="type-sample" style="font-size:36px; font-weight:700">AWS Community Day</span>
+      </div>
+      <div class="type-row">
+        <span class="type-label">--font-size-3xl</span>
+        <span class="type-size">48px</span>
+        <span class="type-sample" style="font-size:30px; font-weight:700">Titulo Hero</span>
+      </div>
+      <div class="type-row">
+        <span class="type-label">--font-size-2xl</span>
+        <span class="type-size">36px</span>
+        <span class="type-sample" style="font-size:26px; font-weight:700">Titulo Seccion</span>
+      </div>
+      <div class="type-row">
+        <span class="type-label">--font-size-xl</span>
+        <span class="type-size">24px</span>
+        <span class="type-sample" style="font-size:22px; font-weight:600">Subtitulo</span>
+      </div>
+      <div class="type-row">
+        <span class="type-label">--font-size-lg</span>
+        <span class="type-size">18px</span>
+        <span class="type-sample" style="font-size:18px; font-weight:500">Texto destacado</span>
+      </div>
+      <div class="type-row">
+        <span class="type-label">--font-size-md</span>
+        <span class="type-size">16px</span>
+        <span class="type-sample" style="font-size:16px">Texto principal / Body</span>
+      </div>
+      <div class="type-row">
+        <span class="type-label">--font-size-sm</span>
+        <span class="type-size">14px</span>
+        <span class="type-sample" style="font-size:14px">Texto secundario</span>
+      </div>
+      <div class="type-row">
+        <span class="type-label">--font-size-xs</span>
+        <span class="type-size">12px</span>
+        <span class="type-sample" style="font-size:12px">Etiquetas, captions</span>
+      </div>
+      <div class="type-row">
+        <span class="type-label">--font-size-xxs</span>
+        <span class="type-size">10px</span>
+        <span class="type-sample" style="font-size:10px">Micro texto</span>
+      </div>
+    </div>
+
+    <h3 style="color:#99a; font-size:13px; margin:24px 0 12px; font-weight:600;">Pesos de Fuente &mdash; Amazon Ember</h3>
+    <div class="font-weights">
+      <div class="weight-card">
+        <div class="sample" style="font-weight:200">Aa</div>
+        <div class="label">Thin</div>
+        <div class="value">200</div>
+      </div>
+      <div class="weight-card">
+        <div class="sample" style="font-weight:300">Aa</div>
+        <div class="label">Light</div>
+        <div class="value">300</div>
+      </div>
+      <div class="weight-card">
+        <div class="sample" style="font-weight:400">Aa</div>
+        <div class="label">Regular</div>
+        <div class="value">400</div>
+      </div>
+      <div class="weight-card">
+        <div class="sample" style="font-weight:500">Aa</div>
+        <div class="label">Medium</div>
+        <div class="value">500</div>
+      </div>
+      <div class="weight-card">
+        <div class="sample" style="font-weight:700">Aa</div>
+        <div class="label">Bold</div>
+        <div class="value">700</div>
+      </div>
+      <div class="weight-card">
+        <div class="sample" style="font-weight:900">Aa</div>
+        <div class="label">Heavy</div>
+        <div class="value">900</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== ESPACIADO ========== -->
+  <section id="spacing">
+    <h2 class="section-title">Espaciado & Layout</h2>
+    <p class="section-desc">Sistema responsive mobile-first. Grid: Bootstrap (col-12, col-md-*, col-lg-*). Breakpoints: Mobile &lt; 768px, Tablet 768-1024px, Desktop &gt; 1024px.</p>
+
+    <table class="spacing-table">
+      <thead>
+        <tr>
+          <th>Variable CSS</th>
+          <th>Mobile</th>
+          <th>Tablet</th>
+          <th>Desktop</th>
+          <th>Visual</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>--padding-*</td>
+          <td>1rem (16px)</td>
+          <td>5rem (80px)</td>
+          <td>10rem (160px)</td>
+          <td><div class="spacing-bar" style="width: 100%"></div></td>
+        </tr>
+        <tr>
+          <td>--margin-*</td>
+          <td>5rem (80px)</td>
+          <td>6.25rem (100px)</td>
+          <td>7.5rem (120px)</td>
+          <td><div class="spacing-bar" style="width: 75%"></div></td>
+        </tr>
+        <tr>
+          <td>--margin-negative-*</td>
+          <td>-1rem</td>
+          <td>-5rem</td>
+          <td>-10rem</td>
+          <td><div class="spacing-bar" style="width: 50%; background: var(--red); opacity: 0.5"></div></td>
+        </tr>
+        <tr>
+          <td>--padding-top-generic</td>
+          <td colspan="3">5rem (80px) &mdash; Aplicado a todas las secciones</td>
+          <td><div class="spacing-bar" style="width: 40%"></div></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ========== COMPONENTES ========== -->
+  <section id="components">
+    <h2 class="section-title">Componentes UI</h2>
+    <p class="section-desc">Componentes compartidos del main_website Angular. Libreria UI: ng-zorro (Ant Design para Angular).</p>
+
+    <div class="component-grid">
+      <!-- Speaker Card -->
+      <div class="component-card">
+        <div class="component-preview">
+          <div style="text-align:center">
+            <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#2a3060,#1a2040);margin:0 auto 8px;position:relative;overflow:hidden">
+              <div style="position:absolute;bottom:0;left:0;right:0;height:40%;background:#00000055;display:flex;align-items:center;justify-content:center;color:#61dafb;font-size:14px">in</div>
+            </div>
+            <div style="color:#fff;font-size:13px;font-weight:600">Speaker Name</div>
+          </div>
+        </div>
+        <div class="component-meta">
+          <div class="component-name">Speaker Card</div>
+          <div class="component-desc">Imagen circular + nombre + icono LinkedIn. Hover con sombra y overlay.</div>
+          <span class="component-file">speaker-card/</span>
+        </div>
+      </div>
+
+      <!-- Participant Card -->
+      <div class="component-card">
+        <div class="component-preview">
+          <div style="text-align:center">
+            <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#2a3060,#1a2040);margin:0 auto 8px"></div>
+            <div style="color:#fff;font-size:13px;font-weight:600">Nombre</div>
+            <div style="color:#667;font-size:11px">Rol</div>
+            <div style="color:#556;font-size:10px">Ciudad</div>
+          </div>
+        </div>
+        <div class="component-meta">
+          <div class="component-name">Participant Card</div>
+          <div class="component-desc">Para organizadores. Imagen + nombre + rol + ubicacion.</div>
+          <span class="component-file">participant-card/</span>
+        </div>
+      </div>
+
+      <!-- Schedule Card -->
+      <div class="component-card">
+        <div class="component-preview">
+          <div style="width:100%">
+            <div style="display:flex;gap:12px;padding:10px;background:#1a2040;border-radius:8px;border-left:3px solid var(--orange)">
+              <div>
+                <div style="width:8px;height:8px;background:var(--orange);border-radius:50%;margin-top:4px"></div>
+                <div style="width:1px;height:40px;background:#333;margin:4px auto"></div>
+              </div>
+              <div>
+                <div style="color:#fff;font-size:12px;font-weight:600;margin-bottom:4px">Session Title</div>
+                <div style="color:#667;font-size:10px;margin-bottom:2px">Por Speaker Name</div>
+                <div style="color:#556;font-size:10px">10:00 - 10:30 &middot; Sala A</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="component-meta">
+          <div class="component-name">Schedule Card</div>
+          <div class="component-desc">Timeline con titulo, speaker avatars, sala, hora y categoria/tema.</div>
+          <span class="component-file">schedule-card/</span>
+        </div>
+      </div>
+
+      <!-- Sponsor Card -->
+      <div class="component-card">
+        <div class="component-preview">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center">
+            <div style="width:70px;height:45px;background:#fff;border-radius:6px;opacity:0.3"></div>
+            <div style="width:70px;height:45px;background:#fff;border-radius:6px;opacity:0.3"></div>
+            <div style="width:70px;height:45px;background:#fff;border-radius:6px;opacity:0.3"></div>
+          </div>
+        </div>
+        <div class="component-meta">
+          <div class="component-name">Sponsor Card</div>
+          <div class="component-desc">Grid de logos de sponsors. Recibe array de URLs de imagenes.</div>
+          <span class="component-file">sponsor-card/</span>
+        </div>
+      </div>
+
+      <!-- Information Card -->
+      <div class="component-card">
+        <div class="component-preview">
+          <div style="width:100%;background:#1a2040;border-radius:8px;padding:12px;display:flex;align-items:center;gap:10px">
+            <div style="width:32px;height:32px;background:var(--cerise);border-radius:8px;opacity:0.6;flex-shrink:0"></div>
+            <div style="flex:1">
+              <div style="color:#dde;font-size:12px;font-weight:600">TransMilenio</div>
+            </div>
+            <div style="color:#556;font-size:16px">+</div>
+          </div>
+        </div>
+        <div class="component-meta">
+          <div class="component-name">Information Card</div>
+          <div class="component-desc">Icono SVG + titulo. Click abre modal con detalles de transporte.</div>
+          <span class="component-file">information-card/</span>
+        </div>
+      </div>
+
+      <!-- Activity Carousel -->
+      <div class="component-card">
+        <div class="component-preview">
+          <div style="display:flex;gap:8px;overflow:hidden;width:100%">
+            <div style="min-width:100px;height:80px;background:linear-gradient(135deg,#1a2040,#2a3060);border-radius:8px;display:flex;align-items:flex-end;padding:6px">
+              <span style="font-size:9px;color:#ccd;background:#00000088;padding:2px 6px;border-radius:4px">Charlas</span>
+            </div>
+            <div style="min-width:100px;height:80px;background:linear-gradient(135deg,#2a3060,#1a2040);border-radius:8px;display:flex;align-items:flex-end;padding:6px">
+              <span style="font-size:9px;color:#ccd;background:#00000088;padding:2px 6px;border-radius:4px">Workshops</span>
+            </div>
+          </div>
+        </div>
+        <div class="component-meta">
+          <div class="component-name">Activity Carousel</div>
+          <div class="component-desc">Carousel horizontal con imagenes de actividades y labels.</div>
+          <span class="component-file">activity-carousel/</span>
+        </div>
+      </div>
+
+      <!-- Information Modal -->
+      <div class="component-card">
+        <div class="component-preview">
+          <div style="width:100%;background:#1a2040;border-radius:8px;padding:16px;border:1px solid #2a3050">
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+              <span style="color:#fff;font-size:13px;font-weight:600">TransMilenio</span>
+              <span style="color:#556;font-size:14px">&times;</span>
+            </div>
+            <div style="font-size:11px;color:#99a;margin-bottom:4px">Ruta A4 &mdash; Estacion UN</div>
+            <div style="font-size:11px;color:#99a">Ruta B12 &mdash; CL 26</div>
+          </div>
+        </div>
+        <div class="component-meta">
+          <div class="component-name">Information Modal</div>
+          <div class="component-desc">Modal con detalles de transporte. Controlado por isVisible.</div>
+          <span class="component-file">information-modal/</span>
+        </div>
+      </div>
+
+      <!-- Header -->
+      <div class="component-card">
+        <div class="component-preview">
+          <div style="width:100%">
+            <div style="background:#071026;border-radius:8px;padding:10px 16px;display:flex;align-items:center;justify-content:space-between">
+              <div style="width:80px;height:20px;background:var(--orange);border-radius:4px;opacity:0.7"></div>
+              <div style="display:flex;gap:12px">
+                <span style="font-size:11px;color:#99a">Ubicacion</span>
+                <span style="font-size:11px;color:#99a">FAQ</span>
+                <span style="font-size:11px;color:#99a">Sponsors</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="component-meta">
+          <div class="component-name">Header / Navigation</div>
+          <div class="component-desc">Logo + nav links. Hamburger menu en mobile. Scroll-to-section.</div>
+          <span class="component-file">header/</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== WIREFRAME COMPLETO ========== -->
+  <section id="wf-full">
+    <h2 class="section-title">Wireframe - Vista Completa (Todas las secciones)</h2>
+    <p class="section-desc">Asi se vera la pagina con TODAS las secciones activas. Las secciones con borde amarillo son las que actualmente estan comentadas.</p>
+
+    <div class="wireframe-container">
+      <div class="wireframe-title-bar">
+        <h3>main_website &mdash; Home Page (Full)</h3>
+        <span class="wireframe-status status-partial">OBJETIVO FINAL</span>
+      </div>
+      <div class="wireframe" style="background:#0a0e1a">
+
+        <!-- HEADER -->
+        <div id="wf-header" class="wf-block" style="border-color:#10b981">
+          <span class="wf-block-label" style="color:#10b981">HEADER (activo)</span>
+          <div class="wf-header">
+            <div class="wf-logo"></div>
+            <div class="wf-nav">
+              <div class="wf-nav-item"></div>
+              <div class="wf-nav-item"></div>
+              <div class="wf-nav-item"></div>
+              <div class="wf-nav-item"></div>
+              <div class="wf-nav-item"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- HERO -->
+        <div id="wf-hero" class="wf-block" style="border-color:#10b981">
+          <span class="wf-block-label" style="color:#10b981">HERO (activo)</span>
+          <div class="wf-hero">
+            <div class="wf-hero-title">AWS COMMUNITY DAY<br><span>COLOMBIA</span></div>
+            <div class="wf-hero-subtitle">PRESENCIAL &middot; 23 DE MAYO, 2026</div>
+            <div class="wf-hero-subtitle">&#128205; Universidad Nacional, Bogota</div>
+            <button class="wf-btn">Registrate</button>
+            <div class="wf-timer">
+              <div class="wf-timer-item"><span class="num">44</span>dias</div>
+              <div class="wf-timer-item"><span class="num">12</span>horas</div>
+              <div class="wf-timer-item"><span class="num">33</span>min</div>
+              <div class="wf-timer-item"><span class="num">07</span>seg</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ABOUT -->
+        <div id="wf-about" class="wf-block" style="border-color:#f59e0b">
+          <span class="wf-block-label" style="color:#f59e0b">ABOUT (comentado &rarr; activar)</span>
+          <div class="wf-section-title">Acerca del evento</div>
+          <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px">
+            <div>
+              <div style="height:8px;background:#2a3050;border-radius:4px;margin-bottom:6px;width:100%"></div>
+              <div style="height:8px;background:#2a3050;border-radius:4px;margin-bottom:6px;width:95%"></div>
+              <div style="height:8px;background:#2a3050;border-radius:4px;margin-bottom:6px;width:90%"></div>
+              <div style="height:8px;background:#2a3050;border-radius:4px;margin-bottom:16px;width:70%"></div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <div style="width:80px;height:40px;background:#1a2040;border-radius:6px"></div>
+                <div style="width:80px;height:40px;background:#1a2040;border-radius:6px"></div>
+                <div style="width:80px;height:40px;background:#1a2040;border-radius:6px"></div>
+              </div>
+            </div>
+            <div>
+              <div style="background:#1a2040;border-radius:8px;padding:12px;margin-bottom:8px;display:flex;gap:8px;align-items:center">
+                <div style="width:20px;height:20px;background:var(--cerise);border-radius:4px;opacity:0.5"></div>
+                <span style="font-size:10px;color:#99a">Universidad Nacional</span>
+              </div>
+              <div style="background:#1a2040;border-radius:8px;padding:12px;display:flex;gap:8px;align-items:center">
+                <div style="width:20px;height:20px;background:var(--cerise);border-radius:4px;opacity:0.5"></div>
+                <span style="font-size:10px;color:#99a">23 de Mayo, 2026</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ACTIVITIES -->
+        <div id="wf-activities" class="wf-block" style="border-color:#f59e0b">
+          <span class="wf-block-label" style="color:#f59e0b">ACTIVIDADES (comentado &rarr; activar)</span>
+          <div class="wf-section-title">Que tendremos este ano 2026?</div>
+          <div class="wf-carousel">
+            <div class="wf-carousel-item"><span class="wf-carousel-label">Charlas tecnicas</span></div>
+            <div class="wf-carousel-item"><span class="wf-carousel-label">Workshops</span></div>
+            <div class="wf-carousel-item"><span class="wf-carousel-label">Paneles</span></div>
+            <div class="wf-carousel-item"><span class="wf-carousel-label">BuilderCards</span></div>
+            <div class="wf-carousel-item"><span class="wf-carousel-label">Cert Room</span></div>
+            <div class="wf-carousel-item"><span class="wf-carousel-label">Demos</span></div>
+          </div>
+        </div>
+
+        <!-- SCHEDULE PREVIEW -->
+        <div id="wf-agenda" class="wf-block" style="border-color:#f59e0b">
+          <span class="wf-block-label" style="color:#f59e0b">AGENDA PREVIEW (comentado &rarr; activar)</span>
+          <div class="wf-section-title">Agenda</div>
+          <div class="wf-tabs">
+            <div class="wf-tab active">Sala Principal</div>
+            <div class="wf-tab">Sala 2</div>
+            <div class="wf-tab">Sala 3</div>
+            <div class="wf-tab">Workshops</div>
+          </div>
+          <div class="wf-schedule-item">
+            <span class="wf-schedule-time">10:00-10:30</span>
+            <div class="wf-schedule-info">
+              <div class="title">Keynote Opening</div>
+              <div class="speaker">Por Jeff Barr &middot; La Corona</div>
+            </div>
+          </div>
+          <div class="wf-schedule-item">
+            <span class="wf-schedule-time">10:30-11:15</span>
+            <div class="wf-schedule-info">
+              <div class="title">Building Serverless at Scale</div>
+              <div class="speaker">Por Speaker Name &middot; Sala 2</div>
+            </div>
+          </div>
+          <div class="wf-schedule-item">
+            <span class="wf-schedule-time">11:15-12:00</span>
+            <div class="wf-schedule-info">
+              <div class="title">GenAI Best Practices</div>
+              <div class="speaker">Por Speaker Name &middot; Sala 3</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SPEAKERS -->
+        <div id="wf-speakers" class="wf-block" style="border-color:#f59e0b">
+          <span class="wf-block-label" style="color:#f59e0b">SPEAKERS (comentado &rarr; activar)</span>
+          <div class="wf-section-title">Speakers</div>
+          <div class="wf-card-grid" style="grid-template-columns:repeat(6,1fr)">
+            <div class="wf-card"><div class="wf-card-img"><div class="wf-card-img-circle"></div></div><div class="wf-card-body"><div class="wf-line"></div><div class="wf-line short"></div></div></div>
+            <div class="wf-card"><div class="wf-card-img"><div class="wf-card-img-circle"></div></div><div class="wf-card-body"><div class="wf-line"></div><div class="wf-line short"></div></div></div>
+            <div class="wf-card"><div class="wf-card-img"><div class="wf-card-img-circle"></div></div><div class="wf-card-body"><div class="wf-line"></div><div class="wf-line short"></div></div></div>
+            <div class="wf-card"><div class="wf-card-img"><div class="wf-card-img-circle"></div></div><div class="wf-card-body"><div class="wf-line"></div><div class="wf-line short"></div></div></div>
+            <div class="wf-card"><div class="wf-card-img"><div class="wf-card-img-circle"></div></div><div class="wf-card-body"><div class="wf-line"></div><div class="wf-line short"></div></div></div>
+            <div class="wf-card"><div class="wf-card-img"><div class="wf-card-img-circle"></div></div><div class="wf-card-body"><div class="wf-line"></div><div class="wf-line short"></div></div></div>
+          </div>
+        </div>
+
+        <!-- LOCATION -->
+        <div id="wf-location" class="wf-block" style="border-color:#10b981">
+          <span class="wf-block-label" style="color:#10b981">UBICACION (activo)</span>
+          <div class="wf-section-title">Ubicacion</div>
+          <div class="wf-map-container">
+            <div class="wf-transport-list">
+              <div style="color:#99a;font-size:11px;margin-bottom:4px;font-weight:600">Como llegar?</div>
+              <div class="wf-transport-item"><div class="wf-transport-icon"></div>TransMilenio</div>
+              <div class="wf-transport-item"><div class="wf-transport-icon"></div>SITP</div>
+              <div class="wf-transport-item"><div class="wf-transport-icon"></div>Caminando</div>
+              <div class="wf-transport-item"><div class="wf-transport-icon"></div>Taxi/Uber</div>
+              <div class="wf-transport-item"><div class="wf-transport-icon"></div>Vehiculo</div>
+              <div class="wf-transport-item"><div class="wf-transport-icon"></div>Bicicleta</div>
+            </div>
+            <div class="wf-map">
+              <div style="text-align:center">
+                <div style="font-size:24px;margin-bottom:4px">&#128506;</div>
+                Google Maps Embed<br>
+                <span style="font-size:10px;color:#556">+ Boton Waze</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ORGANIZERS -->
+        <div id="wf-organizers" class="wf-block" style="border-color:#f59e0b">
+          <span class="wf-block-label" style="color:#f59e0b">ORGANIZADORES (comentado &rarr; activar)</span>
+          <div class="wf-section-title">Organizadores</div>
+          <div class="wf-organizer-grid">
+            <div class="wf-organizer"><div class="wf-organizer-avatar"></div><div class="wf-organizer-name">Nombre 1</div></div>
+            <div class="wf-organizer"><div class="wf-organizer-avatar"></div><div class="wf-organizer-name">Nombre 2</div></div>
+            <div class="wf-organizer"><div class="wf-organizer-avatar"></div><div class="wf-organizer-name">Nombre 3</div></div>
+            <div class="wf-organizer"><div class="wf-organizer-avatar"></div><div class="wf-organizer-name">Nombre 4</div></div>
+            <div class="wf-organizer"><div class="wf-organizer-avatar"></div><div class="wf-organizer-name">Nombre 5</div></div>
+            <div class="wf-organizer"><div class="wf-organizer-avatar"></div><div class="wf-organizer-name">Nombre 6</div></div>
+            <div class="wf-organizer"><div class="wf-organizer-avatar"></div><div class="wf-organizer-name">Nombre 7</div></div>
+            <div class="wf-organizer"><div class="wf-organizer-avatar"></div><div class="wf-organizer-name">Nombre 8</div></div>
+          </div>
+          <div style="font-size:10px;color:#556;margin-top:8px;text-align:center">21 organizadores en total &middot; participant-card component</div>
+        </div>
+
+        <!-- FAQ -->
+        <div id="wf-faq" class="wf-block" style="border-color:#10b981">
+          <span class="wf-block-label" style="color:#10b981">FAQ (activo)</span>
+          <div class="wf-section-title">Preguntas frecuentes</div>
+          <div class="wf-faq-item"><span class="wf-faq-q">Es AWS Community Day un evento oficial de AWS?</span><span class="wf-faq-arrow">&#9660;</span></div>
+          <div class="wf-faq-item"><span class="wf-faq-q">A quien esta dirigido este evento?</span><span class="wf-faq-arrow">&#9660;</span></div>
+          <div class="wf-faq-item"><span class="wf-faq-q">Que hace unico a AWS Community Day?</span><span class="wf-faq-arrow">&#9660;</span></div>
+          <div class="wf-faq-item"><span class="wf-faq-q">Puedo asistir de forma virtual?</span><span class="wf-faq-arrow">&#9660;</span></div>
+          <div style="font-size:10px;color:#556;margin-top:8px;text-align:center">8 preguntas en total &middot; nz-collapse accordion</div>
+        </div>
+
+        <!-- SPONSORS INVITE -->
+        <div id="wf-sponsors-invite" class="wf-block" style="border-color:#10b981">
+          <span class="wf-block-label" style="color:#10b981">SPONSORS INVITE (activo)</span>
+          <div style="text-align:center;padding:16px">
+            <div class="wf-section-title" style="display:inline-block">Se parte de la innovacion en la nube!</div>
+            <div style="height:6px;background:#2a3050;border-radius:3px;margin:8px auto;width:80%"></div>
+            <div style="height:6px;background:#2a3050;border-radius:3px;margin:8px auto;width:60%"></div>
+            <div style="margin:12px 0">
+              <div style="display:flex;flex-direction:column;gap:6px;max-width:300px;margin:0 auto;text-align:left">
+                <div style="font-size:11px;color:#10b981">&#10003; Visibilidad de marca</div>
+                <div style="font-size:11px;color:#10b981">&#10003; Red de profesionales</div>
+                <div style="font-size:11px;color:#10b981">&#10003; Participacion directa</div>
+              </div>
+            </div>
+            <button class="wf-btn">Postulate como sponsor</button>
+          </div>
+        </div>
+
+        <!-- SPONSORS -->
+        <div id="wf-sponsors" class="wf-block" style="border-color:#f59e0b">
+          <span class="wf-block-label" style="color:#f59e0b">SPONSORS LOGOS (comentado &rarr; activar)</span>
+          <div class="wf-sponsors-section">
+            <div class="wf-section-title">Nuestros Patrocinadores</div>
+            <div class="wf-sponsor-tier">
+              <div class="wf-sponsor-tier-label">Platinum</div>
+              <div class="wf-sponsor-logos">
+                <div class="wf-sponsor-logo plat"></div>
+                <div class="wf-sponsor-logo plat"></div>
+                <div class="wf-sponsor-logo plat"></div>
+                <div class="wf-sponsor-logo plat"></div>
+                <div class="wf-sponsor-logo plat"></div>
+                <div class="wf-sponsor-logo plat"></div>
+                <div class="wf-sponsor-logo plat"></div>
+              </div>
+            </div>
+            <div class="wf-sponsor-tier">
+              <div class="wf-sponsor-tier-label">Gold</div>
+              <div class="wf-sponsor-logos">
+                <div class="wf-sponsor-logo gold"></div>
+                <div class="wf-sponsor-logo gold"></div>
+                <div class="wf-sponsor-logo gold"></div>
+              </div>
+            </div>
+            <div class="wf-sponsor-tier">
+              <div class="wf-sponsor-tier-label">Bronze</div>
+              <div class="wf-sponsor-logos">
+                <div class="wf-sponsor-logo"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div id="wf-footer" class="wf-block" style="border-color:#10b981">
+          <span class="wf-block-label" style="color:#10b981">FOOTER (activo)</span>
+          <div class="wf-footer">
+            &copy; Copyright <strong>AWS Community Day Colombia</strong>. Todos los derechos reservados.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== MODELOS DE DATOS ========== -->
+  <section id="data-models">
+    <h2 class="section-title">Modelos de Datos</h2>
+    <p class="section-desc">Interfaces TypeScript y archivos JSON que alimentan cada seccion.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div>
+        <div class="model-title">SpeakerInformation</div>
+        <div class="model-block">
+<span class="model-field">name</span>: <span class="model-type">string</span>
+<span class="model-field">image</span>: <span class="model-type">string</span>
+<span class="model-field">linkedIn</span>: <span class="model-type">string</span> <span class="model-optional">// opcional</span>
+<span class="model-field">instagram</span>: <span class="model-type">string</span> <span class="model-optional">// opcional</span>
+        </div>
+
+        <div class="model-title">SessionInformation</div>
+        <div class="model-block">
+<span class="model-field">title</span>: <span class="model-type">string</span>
+<span class="model-field">startsAt</span>: <span class="model-type">string</span>
+<span class="model-field">endsAt</span>: <span class="model-type">string</span>
+<span class="model-field">room</span>: <span class="model-type">string</span>
+<span class="model-field">theme</span>: <span class="model-type">string</span>
+<span class="model-field">themeImage</span>: <span class="model-type">string</span>
+<span class="model-field">speakerName</span>: <span class="model-type">string</span>
+<span class="model-field">speakerProfileList</span>: <span class="model-type">string[]</span>
+<span class="model-field">showSpeaker</span>: <span class="model-type">boolean</span>
+<span class="model-field">showTheme</span>: <span class="model-type">boolean</span>
+        </div>
+
+        <div class="model-title">ActivityInformation</div>
+        <div class="model-block">
+<span class="model-field">title</span>: <span class="model-type">string</span>
+<span class="model-field">image</span>: <span class="model-type">string</span>
+<span class="model-field">description</span>: <span class="model-type">string</span>
+        </div>
+      </div>
+
+      <div>
+        <div class="model-title">QuestionAnswer (FAQ)</div>
+        <div class="model-block">
+<span class="model-field">question</span>: <span class="model-type">string</span>
+<span class="model-field">answer</span>: <span class="model-type">string</span> <span class="model-optional">// HTML permitido</span>
+        </div>
+
+        <div class="model-title">Sponsor</div>
+        <div class="model-block">
+<span class="model-field">tier</span>: <span class="model-type">'Platinum' | 'Gold' | 'Bronze'</span>
+<span class="model-field">logos</span>: <span class="model-type">string[]</span> <span class="model-optional">// URLs</span>
+        </div>
+
+        <div class="model-title">Participant (Organizador)</div>
+        <div class="model-block">
+<span class="model-field">name</span>: <span class="model-type">string</span>
+<span class="model-field">role</span>: <span class="model-type">string</span>
+<span class="model-field">location</span>: <span class="model-type">string</span>
+<span class="model-field">image</span>: <span class="model-type">string</span>
+<span class="model-field">linkedIn</span>: <span class="model-type">string</span>
+<span class="model-field">instagram</span>: <span class="model-type">string</span>
+        </div>
+
+        <div class="model-title">TransportOption</div>
+        <div class="model-block">
+<span class="model-field">id</span>: <span class="model-type">TransportID</span>
+<span class="model-field">title</span>: <span class="model-type">string</span>
+<span class="model-field">icon</span>: <span class="model-type">string</span>
+<span class="model-field">description</span>: <span class="model-type">string</span>
+        </div>
+
+        <div class="model-title">CommunityInformation</div>
+        <div class="model-block">
+<span class="model-field">title</span>: <span class="model-type">string</span>
+<span class="model-field">tooltip</span>: <span class="model-type">string</span>
+<span class="model-field">image</span>: <span class="model-type">string</span>
+<span class="model-field">linkedIn</span>: <span class="model-type">string</span>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="color:#99a; font-size:13px; margin:24px 0 12px; font-weight:600;">Archivos JSON de Datos</h3>
+    <table class="spacing-table">
+      <thead>
+        <tr><th>Archivo</th><th>Contenido</th><th>Usado en</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>activity-information-list.json</td>
+          <td style="color:#99a">7 tipos de actividades con imagen y descripcion</td>
+          <td style="color:#99a">Activity Carousel</td>
+        </tr>
+        <tr>
+          <td>qa-event-list.json</td>
+          <td style="color:#99a">8 preguntas y respuestas frecuentes</td>
+          <td style="color:#99a">FAQ Section</td>
+        </tr>
+        <tr>
+          <td>organizer-list.json</td>
+          <td style="color:#99a">21 organizadores con perfil y redes sociales</td>
+          <td style="color:#99a">Organizers Section</td>
+        </tr>
+        <tr>
+          <td>sponsors-list.json</td>
+          <td style="color:#99a">Sponsors por tier (Platinum: 7, Gold: 3, Bronze: 1)</td>
+          <td style="color:#99a">Sponsors Section</td>
+        </tr>
+        <tr>
+          <td>item-information-list.json</td>
+          <td style="color:#99a">Opciones de transporte con rutas y detalles</td>
+          <td style="color:#99a">Location Modal</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ========== BUILDERS APP ========== -->
+  <section id="builders-app">
+    <h2 class="section-title">Builders App (React)</h2>
+    <p class="section-desc">Aplicacion de asistentes construida con React + AWS Cloudscape Design + Apollo GraphQL. Backend: AWS AppSync + DynamoDB + Cognito.</p>
+
+    <h3 style="color:#99a; font-size:13px; margin-bottom:12px; font-weight:600;">Rutas Disponibles</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="app-card">
+        <h4>Agenda</h4>
+        <span class="route-tag">/agenda</span>
+        <p>Lista de sesiones filtrable por nivel (L100-L400), sala, categoria, idioma. Favoritos. Patrocinadores intercalados cada 5 sesiones.</p>
+      </div>
+      <div class="app-card">
+        <h4>Mi Perfil</h4>
+        <span class="route-tag">/profile</span>
+        <p>ARN unico del asistente, datos personales, PIN, redes sociales. Formato estilo consola AWS.</p>
+      </div>
+      <div class="app-card">
+        <h4>Sesiones de Fotos</h4>
+        <span class="route-tag">/photo-sessions</span>
+        <p>Reserva de slots de 15 min. Muestra disponibilidad en tiempo real. Cancel/Reserve con GraphQL mutations.</p>
+      </div>
+      <div class="app-card">
+        <h4>Mapa del Evento</h4>
+        <span class="route-tag">/map</span>
+        <p>SVGs de planos por piso (floor-1.svg, floor-2.svg). Navegacion por pisos.</p>
+      </div>
+      <div class="app-card">
+        <h4>Panel de Patrocinadores</h4>
+        <span class="route-tag">/sponsor-dashboard</span>
+        <p>Solo grupo "Sponsors". Ver perfil de asistentes, registrar visitas al booth, notas internas.</p>
+      </div>
+      <div class="app-card">
+        <h4>Check-in</h4>
+        <span class="route-tag">/checkin</span>
+        <p>Solo grupo "CheckInVolunteer". Escaneo y registro de asistentes al evento.</p>
+      </div>
+    </div>
+
+    <h3 id="builders-components" style="color:#99a; font-size:13px; margin:24px 0 12px; font-weight:600;">Componentes Clave</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="app-card">
+        <h4>SessionCard</h4>
+        <p>Titulo + favorito + descripcion truncada (100 chars) + horario + escenario + speakers con avatar/company/nacionalidad + badges de nivel con colores (L100=low, L200=medium, L300/L400=high).</p>
+      </div>
+      <div class="app-card">
+        <h4>SponsorLogos (Pasaporte)</h4>
+        <p>Grid de 9 sponsors. Sistema de gamificacion: "Visitado" (verde) / "Pendiente" (gris). Incentiva visitas a booths.</p>
+      </div>
+      <div class="app-card">
+        <h4>SessionDetails</h4>
+        <p>Detalle completo de sesion: info grid, descripcion extendida, speakers con bio/redes, tags de idioma/categoria/nivel, estado de favorito.</p>
+      </div>
+      <div class="app-card">
+        <h4>EditProfile</h4>
+        <p>Formulario: nombre, job title, email, telefono, empresa, PIN (4 digitos), URLs sociales, checkboxes de consentimiento.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== GUIA DE ACTIVACION ========== -->
+  <section id="activation-guide">
+    <h2 class="section-title">Guia: Activar Secciones Comentadas</h2>
+    <p class="section-desc">Pasos para habilitar las 6 secciones actualmente comentadas en home.component.html y la navegacion.</p>
+
+    <div class="highlight-box">
+      <strong>Resumen:</strong> Hay 6 secciones comentadas en el HTML + 2 links de navegacion comentados en el header. El codigo de los componentes ya existe y funciona &mdash; solo necesita descomentarse y actualizar datos.
+    </div>
+
+    <div class="guide-steps">
+      <div class="guide-step">
+        <h4>Descomentar secciones en home.component.html</h4>
+        <p>Archivo: <code>src/app/pages/home/home.component.html</code></p>
+        <p>Remover los comentarios HTML <code>&lt;!-- --&gt;</code> de las siguientes secciones:</p>
+        <div class="code-block"><span class="code-comment">&lt;!-- DESCOMENTAR estas secciones: --&gt;</span>
+
+<span class="code-tag">&lt;section</span> class="col-12" id="about"<span class="code-tag">&gt;</span>
+  <span class="code-tag">&lt;acc-about</span> [communityList]="communityList"<span class="code-tag">&gt;&lt;/acc-about&gt;</span>
+<span class="code-tag">&lt;/section&gt;</span>
+
+<span class="code-tag">&lt;section</span> class="col-12" id="activity"<span class="code-tag">&gt;</span>
+  <span class="code-tag">&lt;acc-activity</span> [activityInformationList]="activityInformationList"<span class="code-tag">&gt;&lt;/acc-activity&gt;</span>
+<span class="code-tag">&lt;/section&gt;</span>
+
+<span class="code-tag">&lt;section</span> class="col-12" id="schedule-preview"<span class="code-tag">&gt;</span>
+  <span class="code-tag">&lt;acc-schedule-preview</span> ...<span class="code-tag">&gt;&lt;/acc-schedule-preview&gt;</span>
+<span class="code-tag">&lt;/section&gt;</span>
+
+<span class="code-tag">&lt;section</span> class="col-12" id="speakers"<span class="code-tag">&gt;</span>
+  <span class="code-tag">&lt;acc-speakers</span> [speakerList]="speakerList"<span class="code-tag">&gt;&lt;/acc-speakers&gt;</span>
+<span class="code-tag">&lt;/section&gt;</span>
+
+<span class="code-tag">&lt;section</span> class="col-12" id="organizers"<span class="code-tag">&gt;</span>
+  <span class="code-tag">&lt;acc-organizers</span> [organizerList]="organizerList"<span class="code-tag">&gt;&lt;/acc-organizers&gt;</span>
+<span class="code-tag">&lt;/section&gt;</span>
+
+<span class="code-tag">&lt;section</span> class="col-12" id="sponsors"<span class="code-tag">&gt;</span>
+  <span class="code-tag">&lt;acc-sponsors&gt;&lt;/acc-sponsors&gt;</span>
+<span class="code-tag">&lt;/section&gt;</span></div>
+      </div>
+
+      <div class="guide-step">
+        <h4>Activar links de navegacion en el Header</h4>
+        <p>Archivo: <code>src/app/shared/components/header/header.component.html</code></p>
+        <p>Descomentar los links de Agenda y Speakers en el nav:</p>
+        <div class="code-block"><span class="code-tag">&lt;ul</span> class="nav__options-list"<span class="code-tag">&gt;</span>
+  <span class="code-tag">&lt;li&gt;&lt;a</span> (click)="closeMenu(); scrollToSection(<span class="code-string">'schedule-preview'</span>)"<span class="code-tag">&gt;</span>Agenda<span class="code-tag">&lt;/a&gt;&lt;/li&gt;</span>
+  <span class="code-tag">&lt;li&gt;&lt;a</span> (click)="closeMenu(); scrollToSection(<span class="code-string">'speakers'</span>)"<span class="code-tag">&gt;</span>Speakers<span class="code-tag">&lt;/a&gt;&lt;/li&gt;</span>
+  <span class="code-tag">&lt;li&gt;&lt;a</span> (click)="closeMenu(); scrollToSection(<span class="code-string">'location'</span>)"<span class="code-tag">&gt;</span>Ubicacion<span class="code-tag">&lt;/a&gt;&lt;/li&gt;</span>
+  <span class="code-tag">&lt;li&gt;&lt;a</span> (click)="closeMenu(); scrollToSection(<span class="code-string">'event-qa'</span>)"<span class="code-tag">&gt;</span>FAQ<span class="code-tag">&lt;/a&gt;&lt;/li&gt;</span>
+  <span class="code-tag">&lt;li&gt;&lt;a</span> (click)="closeMenu(); scrollToSection(<span class="code-string">'sponsors-invite'</span>)"<span class="code-tag">&gt;</span>Sponsors<span class="code-tag">&lt;/a&gt;&lt;/li&gt;</span>
+<span class="code-tag">&lt;/ul&gt;</span></div>
+      </div>
+
+      <div class="guide-step" id="date-updates">
+        <h4>Actualizar fechas y datos del evento 2026</h4>
+        <p>Hay inconsistencias de fechas entre componentes que deben unificarse a <strong>23 de Mayo, 2026</strong>:</p>
+        <div class="warning-box">
+          <strong>Inconsistencia detectada:</strong> El hero dice "23 DE MAYO, 2026" pero el about.component.html dice "28 de junio de 2025". La actividad dice "2025". Unificar todo.
+        </div>
+        <div class="code-block"><span class="code-comment">// Archivos a actualizar:</span>
+
+<span class="code-keyword">1.</span> about.component.html
+   <span class="code-string">"28 de junio de 2025"</span> &rarr; <span class="code-string">"23 de mayo de 2026"</span>
+
+<span class="code-keyword">2.</span> activity.component.html
+   <span class="code-string">"Que tendremos este ano 2025?"</span> &rarr; <span class="code-string">"Que tendremos este ano 2026?"</span>
+
+<span class="code-keyword">3.</span> index.html
+   Actualizar meta tags OG con fecha 2026
+
+<span class="code-keyword">4.</span> hero.component.ts
+   Verificar fecha del countdown timer apunte a 2026-05-23
+
+<span class="code-keyword">5.</span> JSON Data Files
+   Revisar y actualizar datos de sponsors, speakers, sesiones</div>
+      </div>
+
+      <div class="guide-step">
+        <h4>Cargar datos de speakers y sesiones</h4>
+        <p>Los componentes de speakers y schedule-preview necesitan datos. Verificar que el <code>SharedService</code> cargue correctamente:</p>
+        <div class="code-block"><span class="code-comment">// home.component.ts ya tiene las propiedades:</span>
+<span class="code-field">speakerList</span>: SpeakerInformation[] <span class="code-comment">// Alimenta acc-speakers</span>
+<span class="code-field">filteredSessionList</span>: SessionInformation[] <span class="code-comment">// Alimenta acc-schedule-preview</span>
+<span class="code-field">roomList</span>: RoomOption[] <span class="code-comment">// Tabs de salas</span>
+<span class="code-field">communityList</span>: CommunityInformation[] <span class="code-comment">// Logos en About</span>
+<span class="code-field">activityInformationList</span>: ActivityInformation[] <span class="code-comment">// Carousel</span>
+<span class="code-field">organizerList</span>: Participant[] <span class="code-comment">// Grid organizadores</span>
+
+<span class="code-comment">// Verificar que shared.service.ts tenga endpoints/JSON actualizados</span></div>
+      </div>
+
+      <div class="guide-step" id="nav-updates">
+        <h4>Verificar orden de secciones y navegacion</h4>
+        <p>El orden final de secciones en la pagina debe ser:</p>
+        <div class="code-block"><span class="code-keyword">1.</span> Header (con todos los links activos)
+<span class="code-keyword">2.</span> Hero (video bg + countdown + CTA)
+<span class="code-keyword">3.</span> About (descripcion + ubicacion + fecha + logos comunidades)
+<span class="code-keyword">4.</span> Activities (carousel de 7 actividades)
+<span class="code-keyword">5.</span> Schedule Preview (tabs por sala + session cards)
+<span class="code-keyword">6.</span> Speakers (grid de speaker cards)
+<span class="code-keyword">7.</span> Location (mapa + transporte + Waze)
+<span class="code-keyword">8.</span> Organizers (grid de 21 organizadores)
+<span class="code-keyword">9.</span> FAQ (8 preguntas accordion)
+<span class="code-keyword">10.</span> Sponsors Invite (CTA para sponsors)
+<span class="code-keyword">11.</span> Sponsors (logos por tier)
+<span class="code-keyword">12.</span> Footer (copyright)</div>
+      </div>
+
+      <div class="guide-step">
+        <h4>Testing y verificacion</h4>
+        <p>Despues de activar todas las secciones:</p>
+        <div class="code-block"><span class="code-comment"># Ejecutar localmente</span>
+<span class="code-keyword">cd</span> main_website
+<span class="code-keyword">npm</span> install
+<span class="code-keyword">ng</span> serve
+
+<span class="code-comment"># Verificar:</span>
+- Todas las secciones renderizan correctamente
+- Navegacion scroll-to-section funciona para cada link
+- Responsive: probar mobile, tablet, desktop
+- Datos JSON cargan sin errores en consola
+- Video hero reproduce en autoplay
+- Google Maps embed carga correctamente
+- Countdown timer cuenta regresiva correcta al 23 mayo 2026</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <div style="margin-top:64px;padding:24px 0;border-top:1px solid #1a2040;color:#445;font-size:12px;text-align:center">
+    System Design &mdash; AWS Community Day Colombia 2026 &middot; Generado el 9 de abril de 2026
+    <br>
+    Tecnologias: Angular (Main Website) + React + Cloudscape (Builders App) + Apollo GraphQL + AWS CDK
+  </div>
+
+</div>
+
+<script>
+  // Highlight active nav link on scroll
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-link');
+
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(section => {
+      const sectionTop = section.offsetTop - 100;
+      if (scrollY >= sectionTop) {
+        current = section.getAttribute('id');
+      }
+    });
+
+    navLinks.forEach(link => {
+      link.classList.remove('active');
+      if (link.getAttribute('href') === '#' + current) {
+        link.classList.add('active');
+      }
+    });
+  });
+</script>
+</body>
+</html>
